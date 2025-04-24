@@ -3,9 +3,6 @@ import torch
 import torch.nn.functional as F
 from torchmetrics import Accuracy, ConfusionMatrix
 
-# --- !!! Do not use data loader !!! ---
-from data.mirror_seq import make_batch
-
 # PyTorch Lightning module for model and trainer
 class model_wrapper(LightningModule):
     def __init__(self, config, model):
@@ -27,11 +24,10 @@ class model_wrapper(LightningModule):
         return loss, acc, logits_masked, y_masked
 
     def training_step(self, batch, batch_idx):
-        self.config.batch_size = self.config.bs_train
-        batch = make_batch(self.config)
-        x, id, y, mask = batch['input'], batch['pos_id'], batch['target'], batch['mask']
-        x, id, y, mask = x.to(self.device), id.to(self.device), y.to(self.device), mask.to(self.device)
+        x, id = batch['input'], batch['pos_id']
         logits = self.model(x, id)
+        y = batch['target']
+        mask = batch['mask']
         loss, acc, _, _ = self._calculate_loss_acc(logits, y, mask, self.train_acc)
             
         self.log('train/loss', loss, prog_bar=True)
@@ -39,11 +35,10 @@ class model_wrapper(LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        self.config.batch_size = self.config.bs_val
-        batch = make_batch(self.config)
-        x, id, y, mask = batch['input'], batch['pos_id'], batch['target'], batch['mask']
-        x, id, y, mask = x.to(self.device), id.to(self.device), y.to(self.device), mask.to(self.device)
+        x, id = batch['input'], batch['pos_id']
         logits = self.model(x, id)
+        y = batch['target']
+        mask = batch['mask']
         loss, acc, logits_masked, y_masked = self._calculate_loss_acc(logits, y, mask, self.val_acc)
         confusion_matrix = self.get_confusion_matrix(logits_masked, y_masked)
         outputs = {
