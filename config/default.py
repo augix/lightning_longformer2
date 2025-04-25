@@ -23,8 +23,8 @@ config = Namespace(
     n_heads = 8,                  # Number of attention heads
     d_model = 64,                 # Model dimension
     d_ffn = 64*4,                 # Feed-forward network dimension
-    d_id = 64,                    # Dimension of ID embeddings
-    d_value = 64,                  # Dimension of value embeddings
+    d_id = 16,                    # Dimension of ID embeddings, 4 for 2^4=16, 6 for 2^6=64, 8 for 2^8=256, 16 for 2^16=65536
+    d_value = 8,                  # Dimension of value embeddings, 
     dropout = 0.1,                # Dropout rate
     dtype = torch.bfloat16,       # Data type for model parameters
 
