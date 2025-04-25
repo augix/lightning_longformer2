@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from typing import Optional
 import math
     
 class RMSNorm(nn.Module):
