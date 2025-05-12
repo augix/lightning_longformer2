@@ -70,7 +70,7 @@ class mlp(nn.Module):
         x = self.fc2(x)
         return x
 
-class Block(nn.Module):
+class EncoderLayer(nn.Module):
     def __init__(self, layer_id, args):
         super().__init__()
         self.mha = MHA(args)
@@ -95,21 +95,23 @@ class embedding_int(nn.Module):
         # (batch, seq_len) -> (batch, seq_len, d_embed)
         embeded = self.embed(x) * math.sqrt(self.d_embed)
         return embeded
-    
 
 class theModel(nn.Module):
     def __init__(self, config):
-        self.config = config
-        self.dtype = config.dtype
         super().__init__()
-        self.embed = embedding_int(config.n_input_values, config.d_value)
-        self.id_embed = embedding_int(config.seq_len, config.d_id, dtype=self.dtype) 
-        self.correct_dim = nn.Linear(config.d_value + config.d_id, config.d_model)
+        self.config = config
+        dtype = config.dtype
+        d_model = config.d_model
+        d_value = config.d_value
+        d_id = config.d_id
+        self.embed = embedding_int(config.n_input_values, d_value, dtype=dtype)
+        self.id_embed = embedding_int(config.seq_len, d_id, dtype=dtype)
+        self.correct_dim = nn.Linear(d_value + d_id, d_model)
         self.layers = torch.nn.ModuleList()
         for layer_id in range(config.n_layers):
-            self.layers.append(Block(layer_id, config))
-        self.norm = RMSNorm(config.d_model)
-        self.head = nn.Linear(config.d_model, config.n_output_values)
+            self.layers.append(EncoderLayer(layer_id, config))
+        self.norm = RMSNorm(d_model)
+        self.head = nn.Linear(d_model, config.n_output_values)
 
     def forward(self, x, id):
         x = self.embed(x)
@@ -118,5 +120,5 @@ class theModel(nn.Module):
         for layer in self.layers:
             x = layer(x)
         x = self.norm(x)
-        logits = self.head(x)
+        logits = self.head(x) # [batch, seqlen, vocab_size]
         return logits

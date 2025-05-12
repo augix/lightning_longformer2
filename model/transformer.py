@@ -14,18 +14,20 @@ class RMSNorm(nn.Module):
         y = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + self.eps)
         return y.type_as(self.weight) * self.weight
 
-class MHA(nn.Module):
-    def __init__(self, args):
-        super().__init__()
-        self.attn = nn.MultiheadAttention( 
-            embed_dim=args.d_model,
-            num_heads=args.n_heads,
-            dropout=args.dropout,
-            batch_first=True,
-        )
-    def forward(self, x: torch.Tensor):
-        output, _ = self.attn(x, x, x)
-        return output
+# class MHA(nn.Module):
+#     def __init__(self, args):
+#         super().__init__()
+#         self.attn = nn.MultiheadAttention( 
+#             embed_dim=args.d_model,
+#             num_heads=args.n_heads,
+#             dropout=args.dropout,
+#             batch_first=True,
+#         )
+#     def forward(self, x: torch.Tensor):
+#         output, _ = self.attn(x, x, x)
+#         return output
+
+from model.mha import MultiHeadAttention as MHA
 
 class MLP(nn.Module):
     def __init__(self, dim, inter_dim):
@@ -54,7 +56,8 @@ class mlp(nn.Module):
 class EncoderLayer(nn.Module):
     def __init__(self, layer_id, args):
         super().__init__()
-        self.attn = MHA(args)
+        # self.mha = MHA(args)
+        self.mha = MHA(input_dim=args.d_model, embed_dim=args.d_model, num_heads=args.n_heads, dropout=args.dropout)
         # self.ffn = MLP(args.dim, args.inter_dim) if layer_id < args.n_dense_layers else MoE(args)
         self.ffn = MLP(args.d_model, args.d_ffn)
         self.attn_norm = RMSNorm(args.d_model)
@@ -62,7 +65,7 @@ class EncoderLayer(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # pre-norm: norm, attn, add, norm, ffn, add
-        x = x + self.attn(self.attn_norm(x))
+        x = x + self.mha(self.attn_norm(x))
         x = x + self.ffn(self.ffn_norm(x))
         return x
     
