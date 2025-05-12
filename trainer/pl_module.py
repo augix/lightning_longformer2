@@ -46,10 +46,10 @@ class model_wrapper(LightningModule):
         }
 
         # for checkpointing
-        self.log('val_acc', acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=False)
+        self.log('val_acc', acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=False, reduce_fx="mean-v")
         # for logging
-        self.log('val/loss', loss, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True)
-        self.log('val/acc',   acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True)
+        self.log('val/loss', loss, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True, reduce_fx="mean-v")
+        self.log('val/acc',   acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True, reduce_fx="mean-v")
         return outputs
 
     def configure_optimizers(self):
