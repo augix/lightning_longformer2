@@ -2,7 +2,7 @@ from config.default import config
 
 config.name = 'transformer'
 config.model_py = 'model/transformer.py'
-config.strategy = 'ddp'
+config.strategy = 'deepspeed_stage_2' # ddp, ddp_find_unused_parameters_true, deepspeed_stage_2
 config.wandb['tags'] = [config.name]
 
 # checkpoint 

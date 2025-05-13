@@ -42,8 +42,8 @@ config = Namespace(
     val_check_interval = 0.1,     # Fraction of training epoch after which to run validation
     log_every_n_steps = 50,       # Log metrics every N steps
     nnodes = 1,                   # Number of nodes for distributed training
-    devices = 'auto',             # GPU ids to use ('auto' for all available)
-
+    #devices = 'auto',             # GPU ids to use ('auto' for all available)
+    devices = [0,1],
 )
 
 # logging 
