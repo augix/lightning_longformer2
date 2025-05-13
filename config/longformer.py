@@ -2,7 +2,7 @@ from config.default import config
 
 config.name = 'longformer'
 config.model_py = 'model/longformer.py'
-config.strategy = 'ddp_find_unused_parameters_true'
+config.strategy = 'deepspeed_stage_2' # deepspeed_stage_2, ddp_find_unused_parameters_true, ddp
 config.wandb['tags'] = [config.name]
 
 # checkpoint 
