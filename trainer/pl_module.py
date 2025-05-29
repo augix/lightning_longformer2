@@ -30,8 +30,8 @@ class model_wrapper(LightningModule):
         mask = batch['mask']
         loss, acc, _, _ = self._calculate_loss_acc(logits, y, mask, self.train_acc)
             
-        # self.log('train/loss', loss, prog_bar=True)
-        # self.log('train/acc', acc, prog_bar=True)
+        self.log('train/loss', loss, on_step=True, on_epoch=False, sync_dist=False, prog_bar=True)
+        self.log('train/acc',   acc, on_step=True, on_epoch=False, sync_dist=False, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -45,12 +45,16 @@ class model_wrapper(LightningModule):
             'confusion_matrix': confusion_matrix,
         }
 
+        if self.config.platform == 'v5000':
+            reduce_fx = "mean-v"
+        else:
+            reduce_fx = "mean"
+
         # for checkpointing
-        self.log('val_acc', acc, on_step=False, on_epoch=True, sync_dist=False, prog_bar=False)
-        # self.log('val_acc', acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=False, reduce_fx="mean-v")
+        self.log('val_acc', acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=False, reduce_fx=reduce_fx)
         # for logging
-        # self.log('val/loss', loss, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True, reduce_fx="mean-v")
-        # self.log('val/acc',   acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True, reduce_fx="mean-v")
+        self.log('val/loss', loss, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True, reduce_fx=reduce_fx)
+        self.log('val/acc',   acc, on_step=False, on_epoch=True, sync_dist=True, prog_bar=True, reduce_fx=reduce_fx)
         return outputs
 
     def configure_optimizers(self):

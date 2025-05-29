@@ -5,6 +5,8 @@ import os
 # Configuration for the entire training pipeline
 config = Namespace(
     name = 'default',
+    platform = 'v5000',           # 'v5000' or 'nvidia'
+
     # data 
     data_py = 'data/mirror_seq.py', # Path to data module
     seq_len = 64,                 # Length of input sequences
@@ -39,11 +41,10 @@ config = Namespace(
     lr = 1e-3,                    # Learning rate
     weight_decay = 1e-4,          # Weight decay for optimizer
     max_grad_norm = 0,            # Maximum gradient norm for clipping. 1.0 is conservative, 0.5 is aggressive, 0.0 is no clipping, 5.0 allows large gradients
-    val_check_interval = 0.01,     # Fraction of training epoch after which to run validation
+    val_check_interval = 0.1,     # Fraction of training epoch after which to run validation
     log_every_n_steps = 50,       # Log metrics every N steps
     nnodes = 1,                   # Number of nodes for distributed training
-    #devices = 'auto',             # GPU ids to use ('auto' for all available)
-    devices = [0],
+    devices = 'auto',             # GPU ids to use ('auto' for all available)
 )
 
 # logging 
