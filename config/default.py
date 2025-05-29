@@ -13,7 +13,7 @@ config = Namespace(
     mask_token = 0,               # Token used for masking
     mask_frac = 0.1,             # Fraction of tokens to mask during training
     train_size = 1024*1000,        # Number of training examples
-    val_size = 1024,              # Number of validation examples
+    val_size = 1024*10,              # Number of validation examples
     bs_train = 64,                # Batch size for training
     bs_val = 64,                  # Batch size for validation
 
@@ -39,11 +39,11 @@ config = Namespace(
     lr = 1e-3,                    # Learning rate
     weight_decay = 1e-4,          # Weight decay for optimizer
     max_grad_norm = 0,            # Maximum gradient norm for clipping. 1.0 is conservative, 0.5 is aggressive, 0.0 is no clipping, 5.0 allows large gradients
-    val_check_interval = 0.1,     # Fraction of training epoch after which to run validation
+    val_check_interval = 0.01,     # Fraction of training epoch after which to run validation
     log_every_n_steps = 50,       # Log metrics every N steps
     nnodes = 1,                   # Number of nodes for distributed training
     #devices = 'auto',             # GPU ids to use ('auto' for all available)
-    devices = [0,1],
+    devices = [0],
 )
 
 # logging 
